@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=1.0" />
+  <title>Wear's Plumbing LLC | Call Day or Night</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@300;400;500&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand: #2e7d32;
+      --brand-dark: #1b5e20;
+      --brand-light: #4caf50;
+      --navy: #0d2137;
+      --black: #080c0a;
+      --white: #ffffff;
+      --offwhite: #f4f8f4;
+      --gray: #888;
+      --dark: #0c1410;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; overflow-x: hidden; }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 40px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, transparent 100%);
+      transition: background 0.3s;
+    }
+    nav.scrolled { background: rgba(8,12,10,0.97); }
+    .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .nav-logo img { height: 110px; width: auto; }
+    .nav-logo-text { font-family: 'Oswald', sans-serif; font-size: 1.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--white); }
+    .nav-links { display: flex; gap: 28px; list-style: none; align-items: center; }
+    .nav-links a { font-family: 'Barlow Condensed', sans-serif; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--brand-light); }
+    .btn-nav { background: var(--brand); color: var(--white) !important; padding: 9px 22px; border-radius: 3px; font-weight: 700 !important; }
+    .btn-nav:hover { background: var(--brand-light) !important; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { display: block; width: 26px; height: 2px; background: var(--brand-light); }
+    .mobile-nav { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 300; flex-direction: column; align-items: center; justify-content: center; gap: 40px; }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a { font-family: 'Oswald', sans-serif; font-size: 2rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--white); text-decoration: none; }
+    .mobile-nav a:hover { color: var(--brand-light); }
+    .mobile-close { position: absolute; top: 24px; right: 32px; background: none; border: none; color: var(--white); font-size: 2rem; cursor: pointer; }
+
+    #anim-section { position: relative; }
+    #scroll-space { height: 1200vh; }
+    @media (max-width: 767px) { #scroll-space { height: 700vh; } }
+    #anim-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100svh; z-index: 0; }
+    .canvas-overlay { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.55) 100%); }
+
+    .hero-panel { position: fixed; top: 0; left: 0; width: 100vw; height: 100svh; z-index: 10; display: flex; align-items: flex-end; justify-content: center; pointer-events: none; opacity: 0; transition: opacity 0.5s ease; padding: 0 24px 72px; }
+    .hero-panel.visible { opacity: 1; pointer-events: auto; }
+    .panel-inner { text-align: center; max-width: 700px; }
+    .panel-eyebrow { font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--brand-light); margin-bottom: 16px; text-shadow: 0 1px 8px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.9); }
+    .panel-title { font-family: 'Oswald', sans-serif; font-size: clamp(3.5rem, 8vw, 7rem); font-weight: 700; line-height: 1.0; text-transform: uppercase; color: var(--white); text-shadow: 0 0 40px rgba(0,0,0,1), 0 0 15px rgba(0,0,0,0.9), 2px 2px 0 rgba(0,0,0,0.8); margin-bottom: 20px; }
+    .panel-title span { color: var(--brand-light); }
+    .panel-sub { font-family: 'Barlow', sans-serif; font-size: clamp(1.05rem, 2vw, 1.35rem); font-weight: 500; color: var(--white); max-width: 560px; margin: 0 auto 36px; line-height: 1.65; text-shadow: 0 1px 10px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,1), 2px 2px 4px rgba(0,0,0,0.9); }
+    .btn-primary { display: inline-block; background: var(--brand); color: var(--white); font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 15px 40px; border-radius: 3px; text-decoration: none; border: none; cursor: pointer; transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 20px rgba(46,125,50,0.5); }
+    .btn-primary:hover { background: var(--brand-light); transform: translateY(-2px); }
+    .btn-ghost { display: inline-block; background: transparent; color: var(--white); font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 14px 40px; border-radius: 3px; text-decoration: none; border: 2px solid rgba(255,255,255,0.5); margin-left: 16px; transition: border-color 0.2s, color 0.2s; }
+    .btn-ghost:hover { border-color: var(--brand-light); color: var(--brand-light); }
+
+    .scroll-hint { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 20; display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0; transition: opacity 0.5s; }
+    .scroll-hint.visible { opacity: 1; }
+    .scroll-hint span { font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+    .scroll-arrow { width: 20px; height: 20px; border-right: 2px solid var(--brand-light); border-top: 2px solid var(--brand-light); transform: rotate(-45deg); animation: bounce 1.6s infinite; }
+    @keyframes bounce { 0%,100%{transform:rotate(-45deg) translateY(0)} 50%{transform:rotate(-45deg) translateY(-5px)} }
+
+    #main-page { position: relative; z-index: 10; background: var(--dark); }
+    .section { padding: 100px 40px; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.35em; text-transform: uppercase; color: var(--brand-light); margin-bottom: 12px; text-align: center; }
+    .section-title { font-family: 'Oswald', sans-serif; font-size: clamp(2.4rem, 4vw, 3.6rem); font-weight: 700; text-transform: uppercase; text-align: center; color: var(--white); margin-bottom: 16px; line-height: 1.1; }
+    .section-title span { color: var(--brand-light); }
+    .section-body { font-size: 1.05rem; font-weight: 300; color: rgba(255,255,255,0.7); max-width: 620px; margin: 0 auto 60px; text-align: center; line-height: 1.75; }
+
+    .trust-bar { background: var(--brand); padding: 20px 40px; display: flex; align-items: center; justify-content: center; gap: 48px; flex-wrap: wrap; }
+    .trust-item { font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--white); display: flex; align-items: center; gap: 8px; }
+    .trust-item .ti { font-size: 1.3rem; }
+
+    .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .service-card { background: #1a1f1a; padding: 40px 30px; text-align: center; transition: background 0.2s; }
+    .service-card:hover { background: #222822; }
+    .service-icon { font-size: 2.4rem; margin-bottom: 16px; }
+    .service-card h3 { font-family: 'Oswald', sans-serif; font-size: 1.2rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brand-light); margin-bottom: 12px; }
+    .service-card p { font-size: 0.9rem; color: rgba(255,255,255,0.6); line-height: 1.65; }
+
+    #about { background: #0a0f0a; }
+    .about-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .about-img-wrap { position: relative; }
+    .about-img-wrap img { width: 100%; border-radius: 3px; display: block; }
+    .about-img-badge { position: absolute; bottom: -20px; right: -20px; background: var(--brand); padding: 20px 24px; text-align: center; }
+    .about-img-badge .num { font-family: 'Oswald', sans-serif; font-size: 2rem; font-weight: 700; color: var(--white); line-height: 1; }
+    .about-img-badge .lbl { font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.8); }
+    .about-text .section-label { text-align: left; }
+    .about-text .section-title { text-align: left; font-size: clamp(2rem, 3.5vw, 3rem); }
+    .about-text .section-body { text-align: left; margin-left: 0; }
+
+    #gallery { background: var(--dark); }
+    .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+    .gallery-item { aspect-ratio: 1; overflow: hidden; cursor: pointer; position: relative; }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+    .gallery-item:hover img { transform: scale(1.05); }
+    .gallery-item-overlay { position: absolute; inset: 0; background: rgba(46,125,50,0); transition: background 0.3s; }
+    .gallery-item:hover .gallery-item-overlay { background: rgba(46,125,50,0.2); }
+
+    #contact { background: #0a0f0a; }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+    .contact-info h3 { font-family: 'Oswald', sans-serif; font-size: 1.8rem; font-weight: 700; text-transform: uppercase; color: var(--white); margin-bottom: 24px; }
+    .contact-detail { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+    .contact-detail-icon { width: 44px; height: 44px; background: var(--brand); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .contact-detail-text h4 { font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--brand-light); margin-bottom: 4px; }
+    .contact-detail-text p { font-size: 1rem; color: rgba(255,255,255,0.8); }
+    .contact-detail-text a { color: rgba(255,255,255,0.8); text-decoration: none; }
+    .contact-detail-text a:hover { color: var(--brand-light); }
+
+    #chat-widget-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 500; }
+    .chat-widget-label { display: flex; align-items: center; gap: 6px; background: var(--brand); color: var(--white); font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 14px 6px 12px; border-radius: 20px; box-shadow: 0 3px 12px rgba(46,125,50,0.5); cursor: pointer; transition: background 0.2s, transform 0.2s; white-space: nowrap; }
+    .chat-widget-label:hover { background: var(--brand-light); transform: translateY(-1px); }
+
+    @media (max-width: 767px) {
+      .chat-widget-label { font-size: 0.7rem; padding: 4px 10px; }
+      .hero-panel { padding: 0 20px 100px; }
+      .panel-title { font-size: clamp(2.8rem, 10vw, 4rem); margin-bottom: 10px; }
+      .panel-eyebrow { margin-bottom: 4px; }
+      .panel-sub { font-size: 0.95rem; margin-bottom: 20px; line-height: 1.45; }
+      .btn-primary, .btn-ghost { padding: 10px 20px; font-size: 0.9rem; }
+      .scroll-hint { bottom: 14px; }
+    }
+
+    #chat-box { position: fixed; bottom: 80px; right: 24px; z-index: 500; width: 360px; max-height: 520px; background: rgba(8,12,10,0.98); border: 1px solid rgba(46,125,50,0.3); border-radius: 8px; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.7); }
+    #chat-box.open { display: flex; }
+    .chat-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: rgba(46,125,50,0.15); border-bottom: 1px solid rgba(46,125,50,0.25); }
+    .chat-header img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--brand-light); }
+    .chat-header h4 { font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 600; color: var(--white); }
+    .chat-header span { font-size: 0.72rem; color: #4caf50; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .msg { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 0.875rem; line-height: 1.5; }
+    .msg.assistant { background: #1a2018; border: 1px solid rgba(46,125,50,0.25); align-self: flex-start; border-bottom-left-radius: 4px; }
+    .msg.user { background: var(--brand); color: var(--white); align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 600; }
+    .chat-input-row { display: flex; align-items: flex-end; gap: 8px; padding: 10px 12px; border-top: 1px solid rgba(46,125,50,0.15); }
+    .chat-textarea { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 9px 12px; color: var(--white); font-family: 'Barlow', sans-serif; font-size: 0.875rem; resize: none; min-height: 38px; max-height: 100px; outline: none; }
+    .chat-textarea:focus { border-color: rgba(76,175,80,0.5); }
+    .chat-send { background: var(--brand); border: none; border-radius: 6px; width: 38px; height: 38px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s; }
+    .chat-send:hover { background: var(--brand-light); }
+    .chat-send svg { width: 16px; height: 16px; fill: #fff; }
+
+    footer { background: #060a06; padding: 40px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(46,125,50,0.25); }
+    .footer-logo { display: flex; align-items: center; gap: 10px; }
+    .footer-logo img { height: 32px; }
+    .footer-logo span { font-family: 'Oswald', sans-serif; font-size: 0.95rem; font-weight: 600; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+    .footer-copy { font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+    .footer-phone { font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 600; color: var(--brand-light); text-decoration: none; }
+    .footer-phone:hover { color: #80e080; }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .services-grid { grid-template-columns: 1fr; }
+      .about-inner { grid-template-columns: 1fr; gap: 40px; }
+      .about-img-badge { right: 0; bottom: -16px; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+      #chat-box { width: calc(100vw - 32px); right: 16px; }
+      .section { padding: 70px 20px; }
+      .trust-bar { gap: 24px; padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav id="main-nav">
+  <a href="#" class="nav-logo">
+    <img src="logo.png" alt="Wear's Plumbing LLC" onerror="this.style.display='none'" />
+    <span class="nav-logo-text">Wear's Plumbing</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="tel:5099901965" class="btn-nav">Call Day or Night</a></li>
+  </ul>
+  <div class="hamburger" onclick="openMobileNav()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<div class="mobile-nav" id="mobile-nav">
+  <button class="mobile-close" onclick="closeMobileNav()">✕</button>
+  <a href="#services" onclick="closeMobileNav()">Services</a>
+  <a href="#about" onclick="closeMobileNav()">About</a>
+  <a href="#gallery" onclick="closeMobileNav()">Gallery</a>
+  <a href="tel:5099901965" onclick="closeMobileNav()">Call Day or Night</a>
+</div>
+
+<div id="anim-section">
+  <canvas id="anim-canvas"></canvas>
+  <div class="canvas-overlay"></div>
+  <div id="scroll-space"></div>
+
+  <div class="hero-panel" id="panel-1">
+    <div class="panel-inner">
+      <p class="panel-eyebrow">Licensed · Bonded · Insured</p>
+      <h1 class="panel-title">Wear's<br/><span>Plumbing</span></h1>
+      <p class="panel-sub">Residential and commercial plumbing you can count on. Drayton Wear Jr. answers the phone — day or night.</p>
+      <a href="tel:5099901965" class="btn-primary">Call for a Free Quote</a>
+      <a href="#services" class="btn-ghost">Our Services</a>
+    </div>
+  </div>
+
+  <div class="hero-panel" id="panel-2">
+    <div class="panel-inner">
+      <p class="panel-eyebrow">Day or Night — We Show Up</p>
+      <h2 class="panel-title">No Job<br/><span>Too Small.</span></h2>
+      <p class="panel-sub">Hot water heaters, remodels, sink repairs — done right, on time, by a plumber who actually gives a damn.</p>
+    </div>
+  </div>
+
+  <div class="hero-panel" id="panel-3">
+    <div class="panel-inner">
+      <p class="panel-eyebrow">Ready to Schedule?</p>
+      <h2 class="panel-title">Call or<br/><span>Chat Now.</span></h2>
+      <p class="panel-sub">Residential and commercial. Licensed, bonded, insured. Drayton takes the call personally.</p>
+      <a href="tel:5099901965" class="btn-primary">📞 (509) 990-1965</a>
+    </div>
+  </div>
+
+  <div class="scroll-hint" id="scroll-hint">
+    <div class="scroll-arrow"></div>
+    <span>Scroll</span>
+  </div>
+</div>
+
+<div id="main-page">
+
+  <div class="trust-bar">
+    <div class="trust-item"><span class="ti">✓</span> Licensed</div>
+    <div class="trust-item"><span class="ti">✓</span> Bonded</div>
+    <div class="trust-item"><span class="ti">✓</span> Insured</div>
+    <div class="trust-item"><span class="ti">🕐</span> Day or Night</div>
+    <div class="trust-item"><span class="ti">🏠</span> Residential &amp; Commercial</div>
+  </div>
+
+  <div id="services">
+    <div class="section">
+      <p class="section-label">What We Do</p>
+      <h2 class="section-title">Full-Service <span>Plumbing</span></h2>
+      <p class="section-body">From hot water heaters to full bathroom remodels — Wear's Plumbing LLC handles residential and commercial jobs with the experience and professionalism you deserve.</p>
+      <div class="services-grid">
+        <div class="service-card"><div class="service-icon">🔥</div><h3>Hot Water Heaters</h3><p>Tank and tankless installation, repair, and replacement. Fast turnaround so you're not stuck with cold showers.</p></div>
+        <div class="service-card"><div class="service-icon">🔧</div><h3>Repairs</h3><p>Leaks, clogs, broken fixtures — diagnosed and fixed right the first time.</p></div>
+        <div class="service-card"><div class="service-icon">🚿</div><h3>Sinks &amp; Fixtures</h3><p>Kitchen and bath fixture installs, upgrades, and repairs done clean and on schedule.</p></div>
+        <div class="service-card"><div class="service-icon">🏗️</div><h3>Remodels</h3><p>Full bathroom and kitchen plumbing remodels. We work with your contractor or go solo.</p></div>
+        <div class="service-card"><div class="service-icon">🏢</div><h3>Commercial</h3><p>Licensed for commercial plumbing work. Shops, offices, multi-unit — we handle it.</p></div>
+        <div class="service-card"><div class="service-icon">🏠</div><h3>Residential</h3><p>Your home deserves reliable plumbing. From small repairs to full system work.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="about" style="background:#0a0f0a;">
+    <div class="section">
+      <div class="about-inner">
+        <div class="about-img-wrap">
+          <img src="photos/about.jpg" alt="Wear's Plumbing" onerror="this.parentElement.style.background='#1a2018';this.parentElement.style.minHeight='400px';this.style.display='none'" />
+          <div class="about-img-badge">
+            <div class="num">LBI</div>
+            <div class="lbl">Licensed · Bonded · Insured</div>
+          </div>
+        </div>
+        <div class="about-text">
+          <p class="section-label">About Us</p>
+          <h2 class="section-title" style="text-align:left">Real Work.<br/><span>Real Plumber.</span></h2>
+          <p class="section-body" style="text-align:left;margin-left:0">Drayton Wear Jr. built Wear's Plumbing LLC on a simple principle — show up when you say you will, do it right, and stand behind your work. Licensed, bonded, and insured for residential and commercial plumbing. Call day or night.</p>
+          <a href="tel:5099901965" class="btn-primary">📞 (509) 990-1965</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="gallery">
+    <div class="section">
+      <p class="section-label">Recent Work</p>
+      <h2 class="section-title">See the <span>Results</span></h2>
+      <p class="section-body">Clean installs, solid work, happy customers. Every job done to Drayton's standard.</p>
+    </div>
+    <div class="gallery-grid" id="gallery-grid"></div>
+  </div>
+
+  <div id="contact" style="background:#0a0f0a;">
+    <div class="section">
+      <p class="section-label">Get In Touch</p>
+      <h2 class="section-title">Schedule a <span>Service Call</span></h2>
+      <p class="section-body">Call, text, or chat. Drayton answers day or night.</p>
+      <div class="contact-grid">
+        <div class="contact-info">
+          <h3>Contact Wear's Plumbing</h3>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">📞</div>
+            <div class="contact-detail-text"><h4>Phone</h4><p><a href="tel:5099901965">(509) 990-1965</a></p></div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">✉️</div>
+            <div class="contact-detail-text"><h4>Email</h4><p><a href="mailto:wearsplumbing@gmail.com">wearsplumbing@gmail.com</a></p></div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">👷</div>
+            <div class="contact-detail-text"><h4>Owner</h4><p>Drayton Wear Jr.</p></div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-detail-icon">🕐</div>
+            <div class="contact-detail-text"><h4>Availability</h4><p>Day or Night — We Answer</p></div>
+          </div>
+          <a href="tel:5099901965" class="btn-primary" style="margin-top:16px">Call Day or Night</a>
+        </div>
+        <div>
+          <div style="background:#1a2018;border:1px solid rgba(46,125,50,0.3);border-radius:6px;overflow:hidden;">
+            <div class="chat-header">
+              <img src="logo.png" alt="Sarah" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2238%22 height=%2238%22><rect width=%2238%22 height=%2238%22 fill=%22%232e7d32%22 rx=%2219%22/><text x=%2219%22 y=%2224%22 text-anchor=%22middle%22 font-size=%2218%22>🔧</text></svg>'" />
+              <div><h4>Sarah — Wear's Plumbing</h4><span>● Online now</span></div>
+            </div>
+            <div class="chat-messages" id="contact-messages" style="height:260px;"></div>
+            <div class="chat-input-row">
+              <textarea class="chat-textarea" id="contact-input" placeholder="Ask about pricing or availability..." rows="1"></textarea>
+              <button class="chat-send" onclick="sendContactMessage()"><svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">
+      <img src="logo.png" alt="Wear's Plumbing" onerror="this.style.display='none'" />
+      <span>Wear's Plumbing LLC</span>
+    </div>
+    <span class="footer-copy">© 2026 Wear's Plumbing LLC · Licensed · Bonded · Insured</span>
+    <a href="tel:5099901965" class="footer-phone">(509) 990-1965</a>
+  </footer>
+
+</div>
+
+<div id="chat-widget-wrap">
+  <div class="chat-widget-label" onclick="toggleWidget()">Chat With Us</div>
+</div>
+
+<div id="chat-box">
+  <div class="chat-header">
+    <img src="logo.png" alt="Sarah" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2238%22 height=%2238%22><rect width=%2238%22 height=%2238%22 fill=%22%232e7d32%22 rx=%2219%22/><text x=%2219%22 y=%2224%22 text-anchor=%22middle%22 font-size=%2218%22>🔧</text></svg>'" />
+    <div><h4>Sarah — Wear's Plumbing</h4><span>● Online now</span></div>
+  </div>
+  <div class="chat-messages" id="widget-messages"></div>
+  <div class="chat-input-row">
+    <textarea class="chat-textarea" id="widget-input" placeholder="How can we help?" rows="1"></textarea>
+    <button class="chat-send" onclick="sendWidgetMessage()"><svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button>
+  </div>
+</div>
+
+<script>
+  const TOTAL = 400;
+  const isMobile = window.innerWidth < 768;
+  const STEP = isMobile ? 4 : 1;
+  const PANELS = { '1': [0.00, 0.15], '2': [0.35, 0.52], '3': [0.78, 0.95] };
+  const SCROLL_HINT_RANGE = [0.00, 0.08];
+
+  function getFrame(p) { return Math.min(Math.floor(p * TOTAL) + 2, TOTAL + 1); }
+  function pad(n) { return String(n).padStart(3, '0'); }
+  function frameSrc(n) { var f = n <= 100 ? 'F1' : n <= 200 ? 'F2' : n <= 300 ? 'F3' : 'F4'; return f + '/frame_' + pad(n) + '.jpg'; }
+
+  var canvas = document.getElementById('anim-canvas');
+  var ctx = canvas.getContext('2d');
+  var images = {}, currentFrame = 2, frameLoaded = false;
+
+  function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; if (images[currentFrame] && images[currentFrame].complete) drawFrame(currentFrame); }
+  window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+  function drawFrame(n) { var img = images[n]; if (!img || !img.complete) return; var cw = canvas.width, ch = canvas.height, iw = img.naturalWidth, ih = img.naturalHeight, scale = Math.max(cw/iw, ch/ih); ctx.clearRect(0,0,cw,ch); ctx.drawImage(img, (cw-iw*scale)/2, (ch-ih*scale)/2, iw*scale, ih*scale); }
+
+  function preloadFrame(n, cb) { if (images[n]) { if (cb && images[n].complete) cb(); return; } var img = new Image(); img.onload = cb || null; img.src = frameSrc(n); images[n] = img; }
+  function preloadAhead(frame, r) { for (var i=1;i<=r;i++) { var f=frame+i; if(f>=1&&f<=TOTAL) preloadFrame(f); var b=frame-i; if(b>=1&&b<=TOTAL) preloadFrame(b); } }
+  function preloadAll() { var n=1; function next() { if(n>TOTAL) return; var fn=n; n+=STEP; if(!images[fn]){var img=new Image();img.onload=next;img.onerror=next;img.src=frameSrc(fn);images[fn]=img;}else next(); } for(var i=0;i<6;i++) next(); }
+
+  preloadFrame(2, function() { frameLoaded=true; drawFrame(2); document.getElementById('panel-1').classList.add('visible'); document.getElementById('scroll-hint').classList.add('visible'); preloadAll(); });
+
+  var scrollSpaceEl = document.getElementById('scroll-space');
+  function getAnimProgress() { var st=window.scrollY, mx=scrollSpaceEl.offsetTop+scrollSpaceEl.offsetHeight-window.innerHeight; return Math.min(Math.max(st/mx,0),1); }
+  function isInAnimSection() { return window.scrollY < scrollSpaceEl.offsetTop+scrollSpaceEl.offsetHeight-window.innerHeight*0.1; }
+
+  function onScroll() {
+    var inAnim = isInAnimSection();
+    canvas.style.display = inAnim ? 'block' : 'none';
+    document.querySelector('.canvas-overlay').style.display = inAnim ? 'block' : 'none';
+    if (!inAnim) { for(var k in PANELS) document.getElementById('panel-'+k).classList.remove('visible'); document.getElementById('scroll-hint').classList.remove('visible'); document.getElementById('main-nav').classList.add('scrolled'); return; }
+    var progress = getAnimProgress();
+    var tf = getFrame(progress);
+    if (tf !== currentFrame) { currentFrame=tf; if(images[currentFrame]&&images[currentFrame].complete){drawFrame(currentFrame);}else{var cap=tf;preloadFrame(currentFrame,function(){if(currentFrame===cap)drawFrame(cap);});} preloadAhead(currentFrame, isMobile?8:14); }
+    for(var key in PANELS){var range=PANELS[key],el=document.getElementById('panel-'+key);if(progress>=range[0]&&progress<=range[1])el.classList.add('visible');else el.classList.remove('visible');}
+    var sh=document.getElementById('scroll-hint');if(progress>=SCROLL_HINT_RANGE[0]&&progress<=SCROLL_HINT_RANGE[1])sh.classList.add('visible');else sh.classList.remove('visible');
+    document.getElementById('main-nav').classList.remove('scrolled');
+  }
+
+  var rafPending = false;
+  window.addEventListener('scroll', function() { if(!rafPending){rafPending=true;requestAnimationFrame(function(){onScroll();rafPending=false;});}}, {passive:true});
+
+  var photoFiles = ['photos/job1.jpg','photos/job2.jpg','photos/job3.jpg','photos/job4.jpg','photos/job5.jpg','photos/job6.jpg'];
+  var grid = document.getElementById('gallery-grid');
+  photoFiles.forEach(function(src) { var wrap=document.createElement('div');wrap.className='gallery-item';var img=document.createElement('img');img.src=src;img.alt='Wear\'s Plumbing job photo';img.onerror=function(){wrap.style.display='none';};var ov=document.createElement('div');ov.className='gallery-item-overlay';wrap.appendChild(img);wrap.appendChild(ov);grid.appendChild(wrap); });
+
+  var SARAH_PROMPT = `You are Sarah, a friendly scheduling assistant for Wear's Plumbing LLC. Owner is Drayton Wear Jr. Help customers schedule service, answer questions about plumbing work, and get them to call or book. Keep responses short and helpful. Always push toward booking a call. Services: hot water heaters, repairs, sinks/fixtures, remodels, residential and commercial plumbing. Available day or night. Phone: (509) 990-1965. Email: wearsplumbing@gmail.com. Licensed, bonded, insured.`;
+
+  function buildSlots() { var slots=[],d=new Date(),c=0; while(c<5){d.setDate(d.getDate()+1);if(d.getDay()!==0&&d.getDay()!==6){slots.push(d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'}));c++;}} return slots; }
+
+  var chatHistories = { widget: [], contact: [] };
+
+  async function callSarah(messages, containerId) {
+    var container=document.getElementById(containerId),el=document.createElement('div');el.className='msg assistant';el.textContent='...';container.appendChild(el);container.scrollTop=container.scrollHeight;
+    try { var sys=SARAH_PROMPT+' Available slots: '+buildSlots().join(', ')+'.'; var res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:messages.slice(-10),system:sys})}); var data=await res.json(); el.textContent=data.content?.[0]?.text||"Sorry, please call us at (509) 990-1965."; }
+    catch(e) { el.textContent="Can't connect right now. Call us at (509) 990-1965."; }
+    container.scrollTop=container.scrollHeight; return el.textContent;
+  }
+
+  function addMsg(cid, role, text) { var c=document.getElementById(cid),el=document.createElement('div');el.className='msg '+role;el.textContent=text;c.appendChild(el);c.scrollTop=c.scrollHeight; }
+
+  var widgetGreeted=false;
+  function toggleWidget() { var box=document.getElementById('chat-box');box.classList.toggle('open');if(box.classList.contains('open')&&!widgetGreeted){widgetGreeted=true;var g="Hey! I'm Sarah with Wear's Plumbing. Need a repair, water heater, or want to schedule something? Drayton's available day or night.";chatHistories.widget.push({role:'assistant',content:g});addMsg('widget-messages','assistant',g);} }
+
+  async function sendWidgetMessage() { var input=document.getElementById('widget-input'),text=input.value.trim();if(!text)return;input.value='';input.style.height='auto';chatHistories.widget.push({role:'user',content:text});addMsg('widget-messages','user',text);var reply=await callSarah(chatHistories.widget,'widget-messages');chatHistories.widget.push({role:'assistant',content:reply}); }
+  document.getElementById('widget-input').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendWidgetMessage();}});
+  document.getElementById('widget-input').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';});
+
+  var contactGreeted=false;
+  function initContactGreeting(){if(contactGreeted)return;contactGreeted=true;var g="Hi! I'm Sarah with Wear's Plumbing. What can I help you with today?";chatHistories.contact.push({role:'assistant',content:g});addMsg('contact-messages','assistant',g);}
+  var contactObserver=new IntersectionObserver(function(e){if(e[0].isIntersecting)initContactGreeting();},{threshold:0.3});
+  contactObserver.observe(document.getElementById('contact'));
+
+  async function sendContactMessage(){var input=document.getElementById('contact-input'),text=input.value.trim();if(!text)return;if(!contactGreeted)initContactGreeting();input.value='';input.style.height='auto';chatHistories.contact.push({role:'user',content:text});addMsg('contact-messages','user',text);var reply=await callSarah(chatHistories.contact,'contact-messages');chatHistories.contact.push({role:'assistant',content:reply});}
+  document.getElementById('contact-input').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendContactMessage();}});
+  document.getElementById('contact-input').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';});
+
+  function openMobileNav(){document.getElementById('mobile-nav').classList.add('open');}
+  function closeMobileNav(){document.getElementById('mobile-nav').classList.remove('open');}
+</script>
+</body>
+</html>
